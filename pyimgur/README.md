@@ -20,6 +20,8 @@ $ export IMGUR_CLIENT_ID='your_client_id'
 $ export IMGUR_CLIENT_SECRET='your_secret'
 ```
 
+(For permanent usage, adding these variables into your `~/.bashrc` is a good
+idea)
 
 - (Optional but recommended) Create your own `virtualenv`
 ```
