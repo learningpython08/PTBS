@@ -62,11 +62,9 @@ def get_args():
     Parses and returns arguments.
     If there is no
     '''
-    parser = argparse.ArgumentParser(usage='./pyimgur.py [/path/to/image]')
+    parser = argparse.ArgumentParser(usage='python pyimgur.py [/path/to/image]')
     parser.add_argument('files', type=str, nargs='+',
                         help='List of images to upload')
-    parser.add_argument('-a', '--album', action='store_true',
-                        help='Enable uploading album')
     if len(sys.argv) < 2:
         parser.print_help()
         sys.exit()
@@ -76,7 +74,6 @@ def get_args():
 
 
 def main():
-    ''' Return False if not found CLIENT_ID or CLIENT_SECRET keys '''
     if not (CLIENT_ID or CLIENT_SECRET):
         print """
 CLIENT_ID or CLIENT_SECRET missing.
@@ -85,12 +82,10 @@ $ export IMGUR_CLIENT_ID='your_client_id'
 $ export IMGUR_CLIENT_SECRET='your_secret'
         """
         sys.exit()
+    if len(sys.argv) > 3:
+        print upload_album(sys.argv[1:])
     else:
-        album_enabled = get_args()
-        if album_enabled:
-            print upload_album(sys.argv[1:])
-        else:
-            print upload_image(sys.argv[1])
+        print upload_image(sys.argv[1])
 
 if __name__ == '__main__':
     main()
