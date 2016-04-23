@@ -17,7 +17,11 @@ AUTH_HEADER = {"Authorization": "Client-ID " + str(CLIENT_ID)}
 
 def upload(img):
     ''' Return uploaded data info in dictionary '''
-    fp = open(img, 'rb').read()
+    try:
+        fp = open(img, 'rb').read()
+    except IOError as e:
+        print "Error: {}".format(e)
+        sys.exit()
     fp_b64 = b64encode(fp)
     payload = {
         'key': CLIENT_SECRET,
@@ -69,8 +73,7 @@ def get_args():
         parser.print_help()
         sys.exit()
 
-    args = parser.parse_args()
-    return args.album
+    parser.parse_args()
 
 
 def main():
@@ -82,10 +85,13 @@ $ export IMGUR_CLIENT_ID='your_client_id'
 $ export IMGUR_CLIENT_SECRET='your_secret'
         """
         sys.exit()
+
+    get_args()
     if len(sys.argv) > 3:
         print upload_album(sys.argv[1:])
     else:
         print upload_image(sys.argv[1])
+
 
 if __name__ == '__main__':
     main()
