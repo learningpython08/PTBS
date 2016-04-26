@@ -66,7 +66,7 @@ def get_args():
     Parses and returns arguments.
     If there is no
     '''
-    parser = argparse.ArgumentParser(usage='python pyimgur.py [/path/to/image]')
+    parser = argparse.ArgumentParser(usage='python pyimgur.py [files]')
     parser.add_argument('files', type=str, nargs='+',
                         help='List of images to upload')
     if len(sys.argv) < 2:
