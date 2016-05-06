@@ -116,7 +116,7 @@ def get_args():
                         help="Specify input file contains album urls")
     parser.add_argument('-d', '--directory',
                         help="Specify directory to store songs.")
-    parser.add_argument('-l', '--link', nargs='+', default=None,
+    parser.add_argument('-u', '--URL', nargs='+', default=None,
                         help="Specify url(s) of song/album")
     if len(sys.argv) < 2:
         parser.print_help()
