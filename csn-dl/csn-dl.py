@@ -118,8 +118,10 @@ def get_args():
                         help="Specify directory to store songs.")
     parser.add_argument('-l', '--link', nargs='+', default=None,
                         help="Specify url(s) of song/album")
+    if len(sys.argv) < 2:
+        parser.print_help()
+        sys.exit()
     args = parser.parse_args()
-
     return args.song, args.filename, args.directory, args.link
 
 
