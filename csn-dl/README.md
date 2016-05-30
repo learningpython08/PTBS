@@ -8,6 +8,7 @@ Một script nhỏ giúp cho việc download các bài nhạc MP3 (320kbps) tạ
 > **Tôi không chịu trách nhiệm về tính bản quyền của các bài hát tại trang
 web trên**
 
+> **UPDATE 30/Jun/2016 Hiện tại trang web này đang tạm dừng hoạt động**
 
 ## Sử dụng thế nào?
 
