@@ -12,26 +12,43 @@ import glob
 import argparse
 
 
-def _ip(hex):
-    ''' Return IP from hex '''
+def get_ip(hex):
+    ''' Calculate IP from hex '''
 
     ip_hex = [hex[i:i+2] for i in range(0, len(hex), 2)][::-1]
     ip_dec = []
-    for iph in ip_hex:
-        ip_dec.append(str(int(iph, 16)))
+    [ip_dec.append(str(int(iph, 16))) for iph in ip_hex]
     return '.'.join(ip_dec)
 
 
-def _owner(uid):
-    ''' Return username of uid '''
-    with open('/etc/passwd') as f:
-        for line in f.readlines():
-            if line.split(':')[2] == str(uid):
-                return line.split(':')[0]
+def error(message, err):
+    ''' Custom error message and detail err'''
+    print "{}".format(message)
+    print "Detail: {}".format(err)
+    sys.exit(1)
 
 
-def _state(state):
-    ''' Return status of socket based on state code '''
+def read_file(path, is_continue=None):
+    ''' Read file and return file object '''
+    try:
+        with open(path, 'rb') as f:
+            return f.read()
+    except IOError as e:
+        error("Unable to read {}".format(path), e)
+    except:
+        raise
+
+
+def get_owner(uid):
+    ''' Get owner of running uid '''
+    pwd = read_file('/etc/passwd')
+    for line in pwd.splitlines():
+        if line.split(':')[2] == str(uid):
+            return line.split(':')[0]
+
+
+def get_state(state):
+    ''' Get status of socket based on state code '''
     STAT = {1: 'ESTABLISHED',
             2: 'SYN_SENT',
             3: 'SYN_RECV',
@@ -43,26 +60,26 @@ def _state(state):
             9: 'LAST_ACK',
             10: 'LISTEN',
             11: 'CLOSING',
-            12: 'NEW_SYN_RECV'
-            }
+            12: 'NEW_SYN_RECV'}
     return STAT[int(state, 16)]
 
 
-def _cmdline(inode):
+def get_cmd_pid(inode):
     ''' Return list of pid and cmdline '''
     real_paths = [os.path.realpath(i) for i in glob.glob('/proc/*/fd/*')]
-    for rp in real_paths:
-        if re.search(inode, rp):
-            pid = rp.split('/')[2]
+    for path in real_paths:
+        if re.search(inode, path):
+            pid = path.split('/')[2]
+            cmd_file = os.path.join('/proc', str(pid), 'cmdline')
             try:
-                with open('/proc/' + str(pid) + '/cmdline') as f:
+                with open(cmd_file) as f:
                     return [pid, f.read()]
             except IOError:
                 continue
 
 
 def parse_line(line):
-    ''' parse line structure and store to dict '''
+    ''' Parse line structure '''
     l = line.split()
     laddr = l[1].split(':')[0]
     lport = l[1].split(':')[1]
@@ -83,26 +100,26 @@ def parse_line(line):
 def netstat(pro):
     ''' Read pro(tcp/udp) socket file '''
     print "User\tProto\tLocal Address\tRemote Address\tState\tPID\tCommand"
-    with open('/proc/net/' + pro) as f:
-        for line in f.read().splitlines()[1:]:
-            l = parse_line(line)
-            p = _cmdline(l['inode'])
-            # tricky
-            if not p:
-                p = [None, None]
+    proc = read_file('/proc/net/' + pro)
+    for line in proc.splitlines()[1:]:
+        l = parse_line(line)
+        p = get_cmd_pid(l.get('inode'))
+        # tricky
+        if not p:
+            p = [None, None]
 
-            if pro == 'tcp':
-                print "{}\t{}\t{}:{}\t{}:{}\t{}\t{}\t{}".format(
-                    _owner(l['uid']), pro, _ip(l['laddr']),
-                    int(l['lport'], 16), _ip(l['raddr']),
-                    int(l['rport'], 16), _state(l['state']),
-                    p[0], p[1])
-            else:
-                print "{}\t{}\t{}:{}\t{}:{}\t{}\t{}\t{}".format(
-                    _owner(l['uid']), pro, _ip(l['laddr']),
-                    int(l['lport'], 16), _ip(l['raddr']),
-                    int(l['rport'], 16), '',
-                    p[0], p[1])
+        if pro == 'tcp':
+            print "{}\t{}\t{}:{}\t{}:{}\t{}\t{}\t{}".format(
+                get_owner(l['uid']), pro, get_ip(l['laddr']),
+                int(l['lport'], 16), get_ip(l['raddr']),
+                int(l['rport'], 16), get_state(l['state']),
+                p[0], p[1])
+        else:
+            print "{}\t{}\t{}:{}\t{}:{}\t{}\t{}\t{}".format(
+                get_owner(l['uid']), pro, get_ip(l['laddr']),
+                int(l['lport'], 16), get_ip(l['raddr']),
+                int(l['rport'], 16), '',
+                p[0], p[1])
 
 
 if __name__ == '__main__':
