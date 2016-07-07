@@ -1,8 +1,7 @@
 ## What is this?
-This repository contains my works when I'm lazy in doing stuffs repeatedly.
+[![Build Status](https://travis-ci.org/cuongnv23/PTBS.svg?branch=master)](https://travis-ci.org/cuongnv23/PTBS)
 
-Instead of just sit there and do it many time over and over again, I write
-these scripts to it.
+Some scripts of mine to automate the boring stuff.
 
 This work is inspired by https://automatetheboringstuff.com
 
